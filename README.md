@@ -1,5 +1,5 @@
 
-# vacation
+# team_day_off
 
 > A Vue.js project
 
@@ -20,5 +20,12 @@ npm run build --report
 ```
 
 For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
-=======
-# team_day_off
+
+
+Apply .gitignore
+아래의 git 명령들을 실행해주면 .gitignore의 파일들이 적용되어 원격 저장소에서 사라진다.
+
+$ git rm -r --cached .
+$ git add .
+$ git commit -m
+
