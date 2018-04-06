@@ -1,0 +1,153 @@
+<template>
+  <div id="contents" class="contents">
+
+    <header class="spot-t01">
+      <h2 class="h-spot">대체휴가 사용</h2>
+      <div class="breadcrumb">
+        <a href="" class="ico_ home">home</a> &gt;
+        <strong>대체휴가 사용</strong>
+      </div>
+    </header>
+
+    <div class="contents-in">
+      <h3 class="h-t01">대체휴가 사용일 입력</h3>
+      <p class="txt-t02">대체휴가 사용일을 입력 해주세요.</p>
+
+      <div class="box-srch05">
+        <div class="wrapData">
+          <select name="" id="" class="select wf80" v-model="useData.userId">
+            <option v-for="opt in options.userId" :value="opt.value">{{ opt.label }}</option>
+          </select>
+
+          <datepicker v-model="useData.useDate" name="uniquename" language="ko" :format="customFormatter"></datepicker>
+          <button class="btn t_m wf60 c_weight" @click="useVacation">확인</button>
+        </div>
+      </div>
+
+      <hr>
+      <div class="row">
+        <table class="tbl-list01">
+          <colgroup>
+            <col style="width:25%">
+            <col style="width:50%">
+            <col style="width:25%">
+          </colgroup>
+          <thead>
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">사용일</th>
+            <th scope="col">삭제</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr v-for="(user, idx) in listUseVacation" :id="user.id">
+            <td>{{ user.userId }}</td>
+            <td>{{ user.useDate }}</td>
+            <td><button @click="deleteVacation(user.id, idx)">삭제</button></td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <!--//contents -->
+</template>
+
+<script>
+  import option from '@/components/common/data/options'
+  import * as firebase from 'firebase';
+  import Datepicker from 'vuejs-datepicker';
+  import moment from 'moment';
+  import axios from 'axios'
+
+  export default {
+    name: 'VacationUse',
+    data: function () {
+      return {
+        listUseVacation: [],
+        useData: {
+          userId: 'PD',
+          useDate: new Date(),
+          editDate: new Date()
+        },
+        flagAddEvt: 0,
+        options: option
+      }
+    },
+    methods: {
+      useVacation () {
+        if (this.flagAddEvt) return
+        this.flagAddEvt = 1
+
+        axios.post('https://friends-vacation.firebaseio.com/list_useVacation.json', {
+          userId: this.useData.userId,
+          useDate: this.useData.useDate,
+          editDate: this.useData.editDate
+        })
+          .then(res => {
+            console.log(res)
+            this.useData.workHours = null
+            this.getVacation()
+            this.flagAddEvt = 0
+          })
+          .catch(error => {
+            console.log(error)
+          })
+
+      },
+      getVacation () {
+        axios.get('https://friends-vacation.firebaseio.com/list_useVacation.json')
+          .then(res => {
+            console.log(res)
+            //this.listUseVacation = res.data
+            const data = res.data
+            const datas = []
+            this.listUseVacation = []
+
+            for (let key in data) {
+              const tempData = {
+                id: key,
+                userId: data[key].userId,
+                useDate: this.customFormatter(data[key].useDate)
+              }
+              datas.push(tempData)
+              //console.log('temp: ' + tempData)
+            }
+
+            // datas.sort((a,b) => {
+            //   let arr0 = a.workDate.toString().split("-");
+            //   let arr1 = b.workDate.toString().split("-");
+            //   let date_a = new Date(arr0[0],arr0[1]-1,arr0[2]);
+            //   let date_b = new Date(arr1[0],arr1[1]-1,arr1[2]);
+            //   if (date_a < date_b) return 1;
+            //   if (date_a > date_b) return -1;
+            //   console.log(a)
+            // })
+
+            this.listUseVacation = datas
+            //alert("!")
+          })
+          .catch(error => {
+            console.log(error)
+          })
+      },
+      deleteVacation (userId, idx) {
+        let isConfirm = confirm('정말로 삭제하시겠습니까?')
+        if (!isConfirm) {
+          return;
+        }
+        firebase.database().ref('list_useVacation').child(userId).remove()
+        this.listUseVacation.splice(idx,1)
+      },
+      customFormatter(date) {
+        return moment(date).format('YYYY-MM-DD');
+      }
+    },
+    created () {
+      this.getVacation()
+    },
+    components: {
+      Datepicker
+    }
+  }
+</script>
