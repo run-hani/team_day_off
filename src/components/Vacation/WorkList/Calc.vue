@@ -64,13 +64,13 @@
       return {
         getData: {
           userId: 'PD',
-          selecYear: '2018',
-          selecMonth: '03'
+          selecYear: this.getTodayYear(),
+          selecMonth: this.getTodayMonth()
         },
         printData: {
           userId: 'PD',
-          selecYear: '2018',
-          selecMonth: '03'
+          selecYear: this.getTodayYear(),
+          selecMonth: this.getTodayMonth()
         },
         works: [],
         printHoursWeekday: 0,
@@ -139,10 +139,19 @@
       ,
       customFormatter2(date) {
         return moment(date).format('YYYYMM');
+      },
+      getTodayYear () {
+        let newDate = new Date();
+        return moment(newDate).format('YYYY');
+      },
+      getTodayMonth () {
+        let newDate = new Date();
+        return moment(newDate).format('MM');
       }
     },
     created () {
       this.getWorks()
+
     }
   }
 </script>
