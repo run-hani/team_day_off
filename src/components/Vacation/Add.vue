@@ -9,7 +9,7 @@
       </div>
     </header>
 
-    <div class="contents-in">
+    <div class="contents-in mxWf-1200">
       <h3 class="h-t01">작업시간 입력</h3>
       <p class="txt-t02">추가근무내역을 입력 해주세요.</p>
 
@@ -33,11 +33,12 @@
       <div class="row">
         <table class="tbl-list01">
           <colgroup>
-            <col style="width:20%">
-            <col style="width:20%">
-            <col style="width:20%">
-            <col style="width:20%">
-            <col style="width:20%">
+            <col style="width:15%">
+            <col style="width:15%">
+            <col style="width:15%">
+            <col style="width:15%">
+            <col style="width:15%">
+            <col style="width:10%">
           </colgroup>
           <thead>
           <tr>
@@ -46,15 +47,17 @@
             <th scope="col">평일/주말</th>
             <th scope="col">등록일</th>
             <th scope="col">작업시간</th>
+            <th scope="col">삭제</th>
           </tr>
           </thead>
           <tbody>
-          <tr v-for="(user, key, idx) in listVacation">
+          <tr v-for="(user, idx) in listVacation" :id="user.id">
             <td>{{ user.userId }}</td>
             <td>{{ user.pjType }}</td>
             <td><span v-if="user.isWeekend" class="em-c02">주말</span><span v-else>평일</span></td>
             <td>{{ user.workDate }}</td>
             <td>{{ user.workHours }}</td>
+            <td><button @click="deleteWork(user.id, idx)">삭제</button></td>
           </tr>
           </tbody>
         </table>
@@ -66,9 +69,10 @@
 
 <script>
   import option from '@/components/common/data/options'
-  import Datepicker from 'vuejs-datepicker';
-  import moment from 'moment';
-  import holidayKR from 'holiday-kr';
+  import * as firebase from 'firebase'
+  import Datepicker from 'vuejs-datepicker'
+  import moment from 'moment'
+  import holidayKR from 'holiday-kr'
   import axios from 'axios'
 
   export default {
@@ -108,9 +112,9 @@
         /* 엽력내용 전송 */
         axios.post('https://friends-vacation.firebaseio.com/list_vacation.json', {
           userId: this.addData.userId,
-          pjType: this.addData.pjType,
+          pjType: Number(this.addData.pjType),
           workDate: this.addData.workDate,
-          workHours: this.addData.workHours,
+          workHours: Number(this.addData.workHours),
           editDate: this.addData.editDate,
           isWeekend: this.addData.isWeekend
         })
@@ -134,6 +138,7 @@
 
             for (let key in data) {
               const tempData = {
+                id: key,
                 userId: data[key].userId,
                 pjType: this.listPjType[data[key].pjType],
                 workDate: this.customFormatter(data[key].workDate),
@@ -159,6 +164,14 @@
           .catch(error => {
             console.log(error)
           })
+      },
+      deleteWork (userId, idx) {
+        let isConfirm = confirm('정말로 삭제하시겠습니까?')
+        if (!isConfirm) {
+          return;
+        }
+        firebase.database().ref('list_vacation').child(userId).remove()
+        this.listVacation.splice(idx,1)
       },
       customFormatter(date) {
         return moment(date).format('YYYY-MM-DD');
