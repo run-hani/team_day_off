@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-
 # team_day_off
 
 > A Vue.js project
@@ -30,8 +28,7 @@ $ git rm -r --cached .
 $ git add .
 $ git commit -m
 
-=======
+
 # team_day_off
 
 풀리퀘 테스트를 위해 파일을 수정해봄
->>>>>>> 60c28d10... 테스트 커밋
