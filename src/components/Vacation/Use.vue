@@ -123,15 +123,15 @@
               //console.log('temp: ' + tempData)
             }
 
-            datas.sort((a,b) => {
-              let arr0 = a.workDate.toString().split("-");
-              let arr1 = b.workDate.toString().split("-");
-              let date_a = new Date(arr0[0],arr0[1]-1,arr0[2]);
-              let date_b = new Date(arr1[0],arr1[1]-1,arr1[2]);
-              if (date_a < date_b) return 1;
-              if (date_a > date_b) return -1;
-              console.log(a)
-            })
+            // datas.sort((a,b) => {
+            //   let arr0 = a.workDate.toString().split("-");
+            //   let arr1 = b.workDate.toString().split("-");
+            //   let date_a = new Date(arr0[0],arr0[1]-1,arr0[2]);
+            //   let date_b = new Date(arr1[0],arr1[1]-1,arr1[2]);
+            //   if (date_a < date_b) return 1;
+            //   if (date_a > date_b) return -1;
+            //   console.log(a)
+            // })
 
             this.listUseVacation = datas
           })
