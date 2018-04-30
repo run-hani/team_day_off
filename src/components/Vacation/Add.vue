@@ -23,7 +23,7 @@
             <option v-for="opt in options.pjType" :value="opt.value">{{ opt.label }}</option>
           </select>
 
-          <datepicker v-model="addData.workDate" name="uniquename" language="ko" :format="customFormatter"></datepicker>
+          <datepicker v-model="addData.workDate" name="uniquename" language="ko" :format="dateYYYYMMDD"></datepicker>
           <input type="number" class="input wf150 m-w40" placeholder="작업시간 (숫자로 기입)" v-model="addData.workHours">
           <button class="btn t_m wf60 c_weight" @click="addVacation">확인</button>
         </div>
@@ -69,9 +69,9 @@
 
 <script>
   import option from '@/components/common/data/options'
+  import { dateYYYYMMDD } from '@/mixins/momentDate'
   import * as firebase from 'firebase'
   import Datepicker from 'vuejs-datepicker'
-  import moment from 'moment'
   import holidayKR from 'holiday-kr'
   import axios from 'axios'
 
@@ -94,6 +94,7 @@
       }
     },
     methods: {
+      dateYYYYMMDD,
       addVacation () {
         if (this.addData.workHours === null) { alert("작업 시간을 입력해 주세요."); return }
         if (this.flagAddEvt) return
@@ -141,7 +142,7 @@
                 id: key,
                 userId: data[key].userId,
                 pjType: this.listPjType[data[key].pjType],
-                workDate: this.customFormatter(data[key].workDate),
+                workDate: this.dateYYYYMMDD(data[key].workDate),
                 workHours: data[key].workHours,
                 isWeekend: data[key].isWeekend
               }
@@ -172,13 +173,10 @@
         }
         firebase.database().ref('list_vacation').child(userId).remove()
         this.listVacation.splice(idx,1)
-      },
-      customFormatter(date) {
-        return moment(date).format('YYYY-MM-DD');
       }
     },
-      created () {
-        this.getVacation()
+    created () {
+      this.getVacation()
     },
     components: {
       Datepicker

@@ -7,6 +7,7 @@
         </select>
 
         <select class="select wf80" v-model="printData.selecYear">
+          <option value="2017">2017</option>
           <option value="2018">2018</option>
         </select>
 
@@ -50,9 +51,9 @@
 
 <script>
   import option from '@/components/common/data/options'
+  import { dateNewYYYY, dateNewMM, dateYYYYMMDD, dateYYYYMM } from '@/mixins/momentDate'
   import * as firebase from 'firebase';
   import Datepicker from 'vuejs-datepicker';
-  import moment from 'moment';
   import axios from 'axios'
 
   export default {
@@ -64,13 +65,13 @@
       return {
         getData: {
           userId: 'PD',
-          selecYear: this.getTodayYear(),
-          selecMonth: this.getTodayMonth()
+          selecYear: this.dateNewYYYY(),
+          selecMonth: this.dateNewMM()
         },
         printData: {
           userId: 'PD',
-          selecYear: this.getTodayYear(),
-          selecMonth: this.getTodayMonth()
+          selecYear: this.dateNewYYYY(),
+          selecMonth: this.dateNewMM()
         },
         works: [],
         printHoursWeekday: 0,
@@ -80,6 +81,11 @@
       }
     },
     methods: {
+      dateNewYYYY,
+      dateNewMM,
+      dateYYYYMMDD,
+      dateYYYYMM,
+
       getWorks () {
         axios.get('https://friends-vacation.firebaseio.com/list_vacation.json')
           .then(res => {
@@ -100,14 +106,14 @@
             this.getData.selecMonth = this.printData.selecMonth
 
             for (let key in data) {
-              let selecMoth_temp = this.customFormatter2(data[key].workDate)
+              let selecMoth_temp = this.dateYYYYMM(data[key].workDate)
 
               if (selecUserId == data[key].userId && selecMonth == selecMoth_temp) {
                 const tempData = {
                   id: key,
                   userId: data[key].userId,
                   workHours: data[key].workHours,
-                  workDate: this.customFormatter(data[key].workDate),
+                  workDate: this.dateYYYYMMDD(data[key].workDate),
                   isWeekend: data[key].isWeekend
                 }
 
@@ -119,7 +125,6 @@
                 }
               }
             }
-            //alert(this.printHoursWeekday)
 
             if(datas.length) {
               this.works = datas
@@ -132,26 +137,10 @@
           .catch(error => {
             console.log(error)
           })
-      },
-      customFormatter(date) {
-        return moment(date).format('YYYY-MM-DD');
-      }
-      ,
-      customFormatter2(date) {
-        return moment(date).format('YYYYMM');
-      },
-      getTodayYear () {
-        let newDate = new Date();
-        return moment(newDate).format('YYYY');
-      },
-      getTodayMonth () {
-        let newDate = new Date();
-        return moment(newDate).format('MM');
       }
     },
     created () {
       this.getWorks()
-
     }
   }
 </script>

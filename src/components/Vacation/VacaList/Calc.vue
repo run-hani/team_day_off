@@ -52,7 +52,7 @@
         <td>{{ countBeforeUseVacation }}<br>
           합계 : {{ countBeforeAllUseVacation }}</td>
       </tr>
-      <tr v-for="idx in 12" :class="{tr_active: idx == getTodayMonth()}">
+      <tr v-for="idx in 12" :class="{tr_active: idx == dateNewM()}">
         <td>{{ idx }}월</td>
         <td><span class="em-slight">{{ countWorkTime[idx-1] }}</span></td>
         <td><span class="em-slight">{{ countWorkTimeX2[idx-1] }}</span></td>
@@ -75,9 +75,9 @@
 
 <script>
   import option from '@/components/common/data/options'
+  import { dateYYYYMMDD, dateYYYY, dateM, dateNewYYYY, dateNewM } from '@/mixins/momentDate'
   import * as firebase from 'firebase';
   import Datepicker from 'vuejs-datepicker';
-  import moment from 'moment';
   import axios from 'axios'
 
   export default {
@@ -108,17 +108,23 @@
 
         getData: {
           userId: 'PD',
-          selecYear: this.getTodayYear()
+          selecYear: this.dateNewYYYY()
         },
         printData: {
           userId: 'PD',
-          selecYear: this.getTodayYear()
+          selecYear: this.dateNewYYYY()
         },
         isPrint: false,
         options: option
       }
     },
     methods: {
+      dateYYYY,
+      dateM,
+      dateYYYYMMDD,
+      dateNewYYYY,
+      dateNewM,
+
       getVacation () {
         axios.get('https://friends-vacation.firebaseio.com/list_useVacation.json')
           .then(res => {
@@ -137,13 +143,13 @@
             this.getData.selecYear = this.printData.selecYear
 
             for (let key in data) {
-              let selecYear_temp = this.customFormatter2(data[key].useDate)
+              let selecYear_temp = this.dateYYYY(data[key].useDate)
 
               if (selecUserId == data[key].userId && selecYear == selecYear_temp) {
                 const tempData = {
                   id: key,
                   userId: data[key].userId,
-                  useDate: this.customFormatter(data[key].useDate)
+                  useDate: this.dateYYYYMMDD(data[key].useDate)
                 }
                 datas.push(tempData)
                 this.setMonthData(this.countUseVacation, data[key])
@@ -203,8 +209,8 @@
             this.getData.selecYear = this.printData.selecYear
 
             for (let key in data) {
-              let selecYear_temp = this.customFormatter2(data[key].workDate)
-              let selecMonth_temp = this.customFormatter3(data[key].workDate)
+              let selecYear_temp = this.dateYYYY(data[key].workDate)
+              let selecMonth_temp = this.dateM(data[key].workDate)
 
               if (selecUserId == data[key].userId && selecYear === selecYear_temp) {
                 const tempData = {
@@ -212,14 +218,14 @@
                   userId: data[key].userId,
                   pjType: data[key].pjType,
                   workHours: data[key].workHours,
-                  workDate: this.customFormatter(data[key].workDate),
+                  workDate: this.dateYYYYMMDD(data[key].workDate),
                   isWeekend: data[key].isWeekend
                 }
 
                 datas.push(tempData)
                 if (!tempData.isWeekend) {
                   // 평일 : 모든 프로젝트 공통
-                  switch(this.customFormatter3(data[key].workDate)) {
+                  switch(this.dateM(data[key].workDate)) {
                     case "1": this.countWorkTime[0] += data[key].workHours; break
                     case "2": this.countWorkTime[1] += data[key].workHours; break
                     case "3": this.countWorkTime[2] += data[key].workHours; break
@@ -235,7 +241,7 @@
                   }
                 } else if (tempData.isWeekend && tempData.pjType != 0) {
                   // 주말 또는 휴일 : 온라인스토어는 제외
-                  switch(this.customFormatter3(data[key].workDate)) {
+                  switch(this.dateM(data[key].workDate)) {
                     case "1": this.countWorkTimeX2[0] += data[key].workHours; break
                     case "2": this.countWorkTimeX2[1] += data[key].workHours; break
                     case "3": this.countWorkTimeX2[2] += data[key].workHours; break
@@ -258,8 +264,8 @@
               if (selecUserId == data[key].userId && selecYear > selecYear_temp) {
                 const tempData = {
                   workHours: data[key].workHours,
-                  workYear: this.customFormatter2(data[key].workDate),
-                  workMonth: this.customFormatter3(data[key].workDate),
+                  workYear: this.dateYYYY(data[key].workDate),
+                  workMonth: this.dateM(data[key].workDate),
                   isWeekend: data[key].isWeekend
                }
 
@@ -287,16 +293,14 @@
                 }
 
                 _temp3[selecYear_temp] = new Array()
-                console.log(_temp)
+                //console.log(_temp)
               }
             }
 
             var temp4 = Object.keys(_temp3)
-            //console.log(Object.keys(_temp3).length)
 
             for(let i = 0; i < Object.keys(_temp3).length; i++){
               let curYear = temp4[i]
-              //console.log(curYear)
 
               for(let j = 0; j < 13; j++) {
                 if(_temp[curYear][j] == null)
@@ -305,7 +309,6 @@
                 if(_temp2[curYear][j] == null)
                   _temp2[curYear][j] = 0
 
-                //alert(_temp[curYear][j])
                 _temp3[curYear][j] = _temp[curYear][j] + _temp2[curYear][j]
               }
             }
@@ -336,12 +339,8 @@
               }
             }
 
-            //alert(this.countCalcWorkTime)
-
             /* 발생일 합산 */
             this.countAllWorkTime = this.getCountAll(this.countCalcWorkTime)
-
-            //alert(this.countAllWorkTime)
 
             if(datas.length) {
               this.listWorkTime = datas
@@ -350,13 +349,12 @@
               this.isPrint = false
             }
 
-            //alert(this.countWorkTime)
           })
           .catch(error => {
             console.log(error)
           })
       },
-      getCountAll(arr) {
+      getCountAll (arr) {
         let count = 0
         for (let i = 0; i < arr.length; i++) {
           count += Number(arr[i])
@@ -364,7 +362,7 @@
         return count
       },
       setMonthData (arr, dataKey) {
-        switch(this.customFormatter3(dataKey.useDate)) {
+        switch(this.dateM(dataKey.useDate)) {
           case "1": arr[0] += 1; break
           case "2": arr[1] += 1; break
           case "3": arr[2] += 1; break
@@ -378,23 +376,6 @@
           case "11": arr[10] += 1; break
           case "12": arr[11] += 1; break
         }
-      },
-      customFormatter(date) {
-        return moment(date).format('YYYY-MM-DD');
-      },
-      customFormatter2(date) {
-        return moment(date).format('YYYY');
-      },
-      customFormatter3(date) {
-        return moment(date).format('M');
-      },
-      getTodayYear () {
-        let newDate = new Date();
-        return moment(newDate).format('YYYY');
-      },
-      getTodayMonth () {
-        let newDate = new Date();
-        return moment(newDate).format('M');
       }
     },
     created () {

@@ -19,7 +19,7 @@
             <option v-for="opt in options.userId" :value="opt.value">{{ opt.label }}</option>
           </select>
 
-          <datepicker v-model="useData.useDate" name="uniquename" language="ko" :format="customFormatter"></datepicker>
+          <datepicker v-model="useData.useDate" name="uniquename" language="ko" :format="dateYYYYMMDD"></datepicker>
           <input type="text" class="input wf300" v-model="useData.desc" placeholder="비고 입력란">
           <button class="btn t_m wf60 c_weight" @click="useVacation">확인</button>
         </div>
@@ -59,9 +59,9 @@
 
 <script>
   import option from '@/components/common/data/options'
+  import { dateYYYYMMDD } from '@/mixins/momentDate'
   import * as firebase from 'firebase'
   import Datepicker from 'vuejs-datepicker'
-  import moment from 'moment'
   import axios from 'axios'
 
   export default {
@@ -80,6 +80,7 @@
       }
     },
     methods: {
+      dateYYYYMMDD,
       useVacation () {
         if (this.flagAddEvt) return
         this.flagAddEvt = 1
@@ -115,7 +116,7 @@
               const tempData = {
                 id: key,
                 userId: data[key].userId,
-                useDate: this.customFormatter(data[key].useDate),
+                useDate: this.dateYYYYMMDD(data[key].useDate),
                 desc: data[key].desc
               }
               datas.push(tempData)
@@ -145,9 +146,6 @@
         }
         firebase.database().ref('list_useVacation').child(userId).remove()
         this.listUseVacation.splice(idx,1)
-      },
-      customFormatter(date) {
-        return moment(date).format('YYYY-MM-DD');
       }
     },
     created () {

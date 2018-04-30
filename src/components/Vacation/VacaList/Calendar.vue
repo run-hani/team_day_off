@@ -5,8 +5,8 @@
 </template>
 
 <script>
+  import { dateYYYYMMDD } from '@/mixins/momentDate'
   import { FullCalendar } from 'vue-full-calendar'
-  import moment from 'moment';
   import axios from 'axios'
 
   export default {
@@ -24,6 +24,7 @@
       }
     },
     methods: {
+      dateYYYYMMDD,
       getWorks () {
         axios.get('https://friends-vacation.firebaseio.com/list_useVacation.json')
           .then(res => {
@@ -36,7 +37,7 @@
               const tempData = {
                 id: key,
                 title: data[key].userId,
-                start: this.customFormatter(data[key].useDate),
+                start: this.dateYYYYMMDD(data[key].useDate),
                 color: '#08aed6'
               }
               datas.push(tempData)
@@ -48,12 +49,6 @@
           .catch(error => {
             console.log(error)
           })
-      },
-      customFormatter(date) {
-        return moment(date).format('YYYY-MM-DD');
-      },
-      customFormatter2(date) {
-        return moment(date).format('YYYYMM');
       }
     },
     created () {

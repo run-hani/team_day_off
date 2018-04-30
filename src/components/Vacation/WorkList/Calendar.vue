@@ -6,7 +6,7 @@
 
 <script>
   import { FullCalendar } from 'vue-full-calendar'
-  import moment from 'moment';
+  import { dateYYYYMMDD } from '@/mixins/momentDate'
   import axios from 'axios'
 
   export default {
@@ -24,6 +24,8 @@
       }
     },
     methods: {
+      dateYYYYMMDD,
+
       getWorks () {
         axios.get('https://friends-vacation.firebaseio.com/list_vacation.json')
           .then(res => {
@@ -36,11 +38,10 @@
               const tempData = {
                 id: key,
                 title: data[key].userId + ' ( ' + data[key].workHours + ' )',
-                start: this.customFormatter(data[key].workDate),
+                start: this.dateYYYYMMDD(data[key].workDate),
                 color: (data[key].isWeekend ? '#EB4997' : '#08aed6')
               }
               datas.push(tempData)
-              //console.log('temp: ' + tempData)
             }
 
             // datas.sort((a,b) => {
@@ -58,12 +59,6 @@
           .catch(error => {
             console.log(error)
           })
-      },
-      customFormatter(date) {
-        return moment(date).format('YYYY-MM-DD');
-      },
-      customFormatter2(date) {
-        return moment(date).format('YYYYMM');
       }
     },
     created () {

@@ -29,7 +29,3 @@
     name: 'WorkList'
   }
 </script>
-
-<style>
-
-</style>
