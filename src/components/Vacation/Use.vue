@@ -9,7 +9,7 @@
       </div>
     </header>
 
-    <div class="contents-in">
+    <div class="contents-in mxWf-1200">
       <h3 class="h-t01">대체휴가 사용일 입력</h3>
       <p class="txt-t02">대체휴가 사용일을 입력 해주세요.</p>
 
@@ -20,6 +20,7 @@
           </select>
 
           <datepicker v-model="useData.useDate" name="uniquename" language="ko" :format="customFormatter"></datepicker>
+          <input type="text" class="input wf300" v-model="useData.desc" placeholder="비고 입력란">
           <button class="btn t_m wf60 c_weight" @click="useVacation">확인</button>
         </div>
       </div>
@@ -28,14 +29,16 @@
       <div class="row">
         <table class="tbl-list01">
           <colgroup>
-            <col style="width:25%">
+            <col style="width:15%">
+            <col style="width:20%">
             <col style="width:50%">
-            <col style="width:25%">
+            <col style="width:15%">
           </colgroup>
           <thead>
           <tr>
             <th scope="col">ID</th>
             <th scope="col">사용일</th>
+            <th scope="col">비고</th>
             <th scope="col">삭제</th>
           </tr>
           </thead>
@@ -43,6 +46,7 @@
           <tr v-for="(user, idx) in listUseVacation" :id="user.id">
             <td>{{ user.userId }}</td>
             <td>{{ user.useDate }}</td>
+            <td>{{ user.desc }}</td>
             <td><button @click="deleteVacation(user.id, idx)">삭제</button></td>
           </tr>
           </tbody>
@@ -55,9 +59,9 @@
 
 <script>
   import option from '@/components/common/data/options'
-  import * as firebase from 'firebase';
-  import Datepicker from 'vuejs-datepicker';
-  import moment from 'moment';
+  import * as firebase from 'firebase'
+  import Datepicker from 'vuejs-datepicker'
+  import moment from 'moment'
   import axios from 'axios'
 
   export default {
@@ -68,6 +72,7 @@
         useData: {
           userId: 'PD',
           useDate: new Date(),
+          desc: '',
           editDate: new Date()
         },
         flagAddEvt: 0,
@@ -82,11 +87,13 @@
         axios.post('https://friends-vacation.firebaseio.com/list_useVacation.json', {
           userId: this.useData.userId,
           useDate: this.useData.useDate,
+          desc: this.useData.desc,
           editDate: this.useData.editDate
         })
           .then(res => {
-            console.log(res)
+            //console.log(res)
             this.useData.workHours = null
+            this.useData.desc = ''
             this.getVacation()
             this.flagAddEvt = 0
           })
@@ -108,24 +115,24 @@
               const tempData = {
                 id: key,
                 userId: data[key].userId,
-                useDate: this.customFormatter(data[key].useDate)
+                useDate: this.customFormatter(data[key].useDate),
+                desc: data[key].desc
               }
               datas.push(tempData)
               //console.log('temp: ' + tempData)
             }
 
-            // datas.sort((a,b) => {
-            //   let arr0 = a.workDate.toString().split("-");
-            //   let arr1 = b.workDate.toString().split("-");
-            //   let date_a = new Date(arr0[0],arr0[1]-1,arr0[2]);
-            //   let date_b = new Date(arr1[0],arr1[1]-1,arr1[2]);
-            //   if (date_a < date_b) return 1;
-            //   if (date_a > date_b) return -1;
-            //   console.log(a)
-            // })
+            datas.sort((a,b) => {
+              let arr0 = a.workDate.toString().split("-");
+              let arr1 = b.workDate.toString().split("-");
+              let date_a = new Date(arr0[0],arr0[1]-1,arr0[2]);
+              let date_b = new Date(arr1[0],arr1[1]-1,arr1[2]);
+              if (date_a < date_b) return 1;
+              if (date_a > date_b) return -1;
+              console.log(a)
+            })
 
             this.listUseVacation = datas
-            //alert("!")
           })
           .catch(error => {
             console.log(error)
