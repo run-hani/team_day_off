@@ -40,19 +40,26 @@ const store = new Vuex.Store({
       })
         .then(res => {
           console.log(res)
-          commit('authUser', {
-            token: res.data.idToken,
-            userId: res.data.localId
-          })
+          alert("가입이 완료되었습니다.")
+          Router.push({ name: 'Signin' })
+          // commit('authUser', {
+          //   token: res.data.idToken,
+          //   userId: res.data.localId
+          // })
           // const now = new Date()
           // const expirationDate = new Date(now.getTime() + 100000000)
           // localStorage.setItem('token', res.data.idToken)
           // localStorage.setItem('userId', res.data.localId)
           // localStorage.setItem('expirationDate', expirationDate)
-          dispatch('storeUser', authData)
-          dispatch('setLogoutTimer', res.data.expiresIn)
+           dispatch('storeUser', authData)
+          // dispatch('setLogoutTimer', res.data.expiresIn)
         })
-        .catch(error => console.log(error))
+        .catch((error) => {
+          let err = error.response
+          if (err.status === 400) {
+            alert("동일한 이메일로 가입된 계정이 존재합니다.")
+          }
+        })
 
       // globalAxios.post('/user.json', {
       //   userId: authData.userId,
