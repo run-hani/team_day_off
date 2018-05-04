@@ -59,7 +59,7 @@
 
 <script>
   import option from '@/components/common/data/options'
-  import { dateYYYYMMDD } from '@/mixins/momentDate'
+  import { dateYYYYMMDD, sortAscending } from '@/mixins/momentDate'
   import * as firebase from 'firebase'
   import Datepicker from 'vuejs-datepicker'
   import axios from 'axios'
@@ -81,6 +81,8 @@
     },
     methods: {
       dateYYYYMMDD,
+      sortAscending,
+
       useVacation () {
         if (this.flagAddEvt) return
         this.flagAddEvt = 1
@@ -92,7 +94,6 @@
           editDate: this.useData.editDate
         })
           .then(res => {
-            //console.log(res)
             this.useData.workHours = null
             this.useData.desc = ''
             this.getVacation()
@@ -101,13 +102,11 @@
           .catch(error => {
             console.log(error)
           })
-
       },
       getVacation () {
         axios.get('https://friends-vacation.firebaseio.com/list_useVacation.json')
           .then(res => {
-            console.log(res)
-            //this.listUseVacation = res.data
+            //console.log(res)
             const data = res.data
             const datas = []
             this.listUseVacation = []
@@ -120,19 +119,10 @@
                 desc: data[key].desc
               }
               datas.push(tempData)
-              //console.log('temp: ' + tempData)
             }
 
-            // datas.sort((a,b) => {
-            //   let arr0 = a.workDate.toString().split("-");
-            //   let arr1 = b.workDate.toString().split("-");
-            //   let date_a = new Date(arr0[0],arr0[1]-1,arr0[2]);
-            //   let date_b = new Date(arr1[0],arr1[1]-1,arr1[2]);
-            //   if (date_a < date_b) return 1;
-            //   if (date_a > date_b) return -1;
-            //   console.log(a)
-            // })
-
+            /* 날짜별 소팅 */
+            this.sortAscending(datas, 'useDate', "-")
             this.listUseVacation = datas
           })
           .catch(error => {

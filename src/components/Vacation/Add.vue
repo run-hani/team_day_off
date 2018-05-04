@@ -69,7 +69,7 @@
 
 <script>
   import option from '@/components/common/data/options'
-  import { dateYYYYMMDD } from '@/mixins/momentDate'
+  import { dateYYYYMMDD, sortAscending } from '@/mixins/momentDate'
   import * as firebase from 'firebase'
   import Datepicker from 'vuejs-datepicker'
   import holidayKR from 'holiday-kr'
@@ -95,6 +95,8 @@
     },
     methods: {
       dateYYYYMMDD,
+      sortAscending,
+
       addVacation () {
         if (this.addData.workHours === null) { alert("작업 시간을 입력해 주세요."); return }
         if (this.flagAddEvt) return
@@ -150,16 +152,7 @@
             }
 
             /* 날짜별 소팅 */
-            datas.sort((a,b) => {
-              let arr0 = a.workDate.toString().split("-")
-              let arr1 = b.workDate.toString().split("-")
-              let date_a = new Date(arr0[0],arr0[1]-1,arr0[2])
-              let date_b = new Date(arr1[0],arr1[1]-1,arr1[2])
-
-              if (date_a < date_b) return 1
-              if (date_a > date_b) return -1
-            })
-
+            this.sortAscending(datas, 'workDate', "-")
             this.listVacation = datas
           })
           .catch(error => {

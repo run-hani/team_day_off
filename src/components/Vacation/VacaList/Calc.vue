@@ -7,8 +7,7 @@
         </select>
 
         <select name="" id="" class="select wf80" v-model="printData.selecYear">
-          <option value="2017">2017</option>
-          <option value="2018">2018</option>
+          <option v-for="opt2 in options.year" :value="opt2.value">{{ opt2.label }}</option>
         </select>
         <button class="btn t_m wf60 c_weight" @click="getWorkAndVaca">확인</button>
       </div>
@@ -36,8 +35,8 @@
       <thead>
       <tr>
         <th scope="col">월</th>
-        <th scope="col">발생<br>(16시간 = 1일)</th>
-        <th scope="col">발생<br>(8시간 = 1일)</th>
+        <th scope="col">평일<br>(16시간 = 1일)</th>
+        <th scope="col">주말<br>(8시간 = 1일)</th>
         <th scope="col">발생 합계</th>
         <th scope="col">사용</th>
       </tr>

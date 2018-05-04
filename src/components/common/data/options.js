@@ -18,6 +18,10 @@ const option = {
     { label: '라이센시', value: 1 },
     { label: 'PRMS', value: 2 }
   ],
+  year: [
+    {label: '2017', value: '2017'},
+    {label: '2018', value: '2018'}
+  ],
   month: [
     { label: '01', value: '01' },
     { label: '02', value: '02' },

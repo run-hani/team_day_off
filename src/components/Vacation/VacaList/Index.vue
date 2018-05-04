@@ -10,7 +10,7 @@
 
     <div class="contents-in mxWf-1200">
       <ul class="tab-t01 n2 mxWf-1200">
-        <router-link to="/VacationList" tag="li" active-class="on" exact>
+        <router-link to="/VacationList/Calc" tag="li" active-class="on">
           <a href="javascript:void(0)">내역</a>
         </router-link>
         <router-link to="/VacationList/Calendar" tag="li" active-class="on">

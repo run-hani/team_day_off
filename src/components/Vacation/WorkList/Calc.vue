@@ -7,8 +7,7 @@
         </select>
 
         <select class="select wf80" v-model="printData.selecYear">
-          <option value="2017">2017</option>
-          <option value="2018">2018</option>
+          <option v-for="opt in options.year" :value="opt.value">{{ opt.value }}</option>
         </select>
 
         <select class="select wf80" v-model="printData.selecMonth">
@@ -23,23 +22,26 @@
 
     <table class="tbl-list01" v-if="isPrint">
       <colgroup>
-        <col style="width:25%">
-        <col style="width:75%">
+        <col style="width:30%">
+        <col style="width:35%">
+        <col style="width:35%">
       </colgroup>
       <thead>
       <tr>
         <th scope="col">등록일</th>
+        <th scope="col">프로젝트</th>
         <th scope="col">시간</th>
       </tr>
       </thead>
       <tbody>
-      <tr v-for="(user, key, idx) in works">
+      <tr v-for="(user, key, idx) in works" :key="user.id">
         <td :class="{ 'em-c02': user.isWeekend }">{{ user.workDate }}</td>
+        <td>{{ user.pjType }}</td>
         <td :class="{ 'em-c02': user.isWeekend }">{{ user.workHours }}</td>
       </tr>
       <tr>
         <td><strong>총계</strong></td>
-        <td>
+        <td colspan="2">
           <div class="tag-t02"><strong>평일 : <span class="em-c04">{{ printHoursWeekday }}</span></strong> 시간</div>
           <div class="tag-t02"><strong>주말 (공휴일) : <span class="em-c02">{{ printHoursWeekend }}</span></strong> 시간</div>
         </td>
@@ -51,7 +53,7 @@
 
 <script>
   import option from '@/components/common/data/options'
-  import { dateNewYYYY, dateNewMM, dateYYYYMMDD, dateYYYYMM } from '@/mixins/momentDate'
+  import { dateNewYYYY, dateNewMM, dateYYYYMMDD, dateYYYYMM, sortAscending } from '@/mixins/momentDate'
   import * as firebase from 'firebase';
   import Datepicker from 'vuejs-datepicker';
   import axios from 'axios'
@@ -74,6 +76,7 @@
           selecMonth: this.dateNewMM()
         },
         works: [],
+        listPjType: ["온라인 스토어", "라이센시", "PRMS"],
         printHoursWeekday: 0,
         printHoursWeekend: 0,
         isPrint: false,
@@ -85,6 +88,7 @@
       dateNewMM,
       dateYYYYMMDD,
       dateYYYYMM,
+      sortAscending,
 
       getWorks () {
         axios.get('https://friends-vacation.firebaseio.com/list_vacation.json')
@@ -112,6 +116,7 @@
                 const tempData = {
                   id: key,
                   userId: data[key].userId,
+                  pjType: this.listPjType[data[key].pjType],
                   workHours: data[key].workHours,
                   workDate: this.dateYYYYMMDD(data[key].workDate),
                   isWeekend: data[key].isWeekend
@@ -125,6 +130,9 @@
                 }
               }
             }
+
+            /* 날짜별 소팅 */
+            this.sortAscending(datas, 'workDate', "-")
 
             if(datas.length) {
               this.works = datas
