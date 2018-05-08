@@ -61,7 +61,7 @@
       }
     },
     methods: {
-      onSubmit () {
+      async onSubmit () {
         const formData = {
           userId: this.userId,
           email: this.email,
@@ -72,7 +72,7 @@
         if(!this.validEmail()) return false;
         if(!this.validPhone()) return false;
 
-        this.getUserList();
+        await this.getUserList();
         if(!this.validDuplicateUserId()) return false;
 
         this.$store.dispatch('signup', formData)
@@ -104,10 +104,10 @@
         }
         return true;
       },
-      getUserList () {
+      async getUserList () {
         let _users = [];
 
-        axios.get('/users.json')
+        await axios.get('/users.json')
           .then(res => {
             const data = res.data
 
@@ -121,7 +121,7 @@
       }
     },
     created () {
-      this.getUserList()
+      //this.getUserList()
     }
   }
 </script>

@@ -29,7 +29,7 @@
     data: function () {
       return {
         hasToken: false,
-        email: 'myrnvl@gmail.com',
+        email: 'myrnvl@nate.com',
         password: '123456'
       }
     },

@@ -60,16 +60,6 @@ const store = new Vuex.Store({
             alert("동일한 이메일로 가입된 계정이 존재합니다.")
           }
         })
-
-      // globalAxios.post('/user.json', {
-      //   userId: authData.userId,
-      //   email: authData.email,
-      //   password: authData.password
-      // })
-      //   .then(res => {
-      //     console.log(res)
-      //   })
-      //   .catch(error => console.log(error))
     },
     login ({commit, dispatch}, authData) {
       axios.post('/verifyPassword?key=AIzaSyA7Y7nQMtyX-XwzBvo2dSIZPAu_IHtFoVg', {
@@ -92,7 +82,30 @@ const store = new Vuex.Store({
           dispatch('fetchUser')
           Router.push({ name: 'VacationAdd' })
         })
-        .catch(error => console.log(error))
+        .catch((error) => {
+          let err = error.response
+          if (err) {
+            // The request was made and the server responded with a status code
+            // that falls out of the range of 2xx
+            //console.log(error.response.data);
+            //console.log(error.response.status);
+            //console.log(error.response.headers);
+
+            if (err.status === 400) {
+              switch(err.data.error.message) {
+                case "EMAIL_NOT_FOUND":
+                  alert("해당 이메일을 찾을 수 없습니다.")
+                  break;
+                case "INVALID_PASSWORD":
+                  alert("비밀번호가 틀렸습니다.");
+                  break
+                default:
+                  alert(err.data.error.message);
+                  break
+              }
+            }
+          }
+        })
     },
     tryAutoLogin ({commit, dispatch}) {
       const token = localStorage.getItem('token')
@@ -125,7 +138,9 @@ const store = new Vuex.Store({
         return
       }
       globalAxios.post('/users.json' + '?auth=' + state.idToken, userData)
-        .then(res => console.log(res))
+        .then((res) => {
+          //console.log(res)
+        })
         .catch(error => console.log(error))
     },
     fetchUser ({commit, state}) {
@@ -134,7 +149,7 @@ const store = new Vuex.Store({
       }
       globalAxios.get('/users.json' + '?auth=' + state.idToken)
         .then(res => {
-          console.log(res)
+          //console.log(res)
           const data = res.data
           const users = []
           for (let key in data) {
@@ -142,7 +157,7 @@ const store = new Vuex.Store({
             user.id = key
             users.push(user)
           }
-          console.log(users)
+          //console.log(users)
           commit('storeUser', users[0])
         })
         .catch(error => console.log(error))
